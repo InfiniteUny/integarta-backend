@@ -1,0 +1,31 @@
+<?php
+
+namespace App\Models;
+
+use App\Traits\Uuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Balance extends Model
+{
+    use HasFactory, Uuids;
+    
+    protected $table = 'balance';
+
+    protected $fillable = [
+        'user_id',
+        'balance',
+        'type',
+        'name',
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function account()
+    {
+        return $this->hasMany(Account::class);
+    }
+}
