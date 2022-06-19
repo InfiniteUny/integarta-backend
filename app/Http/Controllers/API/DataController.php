@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\Balance;
 use App\Models\Account;
 use App\Models\Transaction;
-use App\Models\institution;
+use App\Models\Institution;
 use Carbon\Carbon;
 use Validator;
 
