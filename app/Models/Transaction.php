@@ -18,6 +18,7 @@ class Transaction extends Model
         'description',
         'direction',
         'date',
+        'reference_id',
         'category_name',
         'classification_group',
         'classification_subgroup',

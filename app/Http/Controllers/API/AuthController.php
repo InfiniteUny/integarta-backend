@@ -15,33 +15,6 @@ use Validator;
 
 class AuthController extends BaseController
 {
-    use Token;
-
-    /**
-     * Add account api
-     */
-    public function addAccount(Request $request)
-    {
-        $institution = Institution::where('brick_institution_id', $request->institution_id)->first();
-
-        if ($institution->type == 'E-Wallet') {
-           $data =  $this->generateOTP($institution->institution_id, $request->account_number);
-        }
-    }
-
-    /**
-     * generate OTP
-     */
-    public function generateOTP($id, $username){
-        $endpoint = config('api.brick_url') . 'v1/auth';
-        $token = config('api.brick_api_key');
-        $response = Http::withToken($token)->get($endpoint, [
-            'institution_id' => $id,
-            'username' => $username
-        ]);
-        return $response->json($response->data, 200);
-    }
-
     /**
      * Register api
      */

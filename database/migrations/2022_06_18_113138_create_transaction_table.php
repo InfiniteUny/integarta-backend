@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('transaction', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('account_id')->constraid('account')->onDelete('cascade');
+            $table->string('reference_id');
             $table->float('amount');
             $table->text('description');
             $table->enum('direction',['in','out']);

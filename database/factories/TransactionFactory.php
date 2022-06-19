@@ -18,6 +18,7 @@ class TransactionFactory extends Factory
     {
         return [
             'amount' => $this->faker->randomNumber(6, false),
+            'reference_id' => $this->faker->uuid(),
             'description' => $this->faker->sentence(),
             'direction' => $this->faker->randomElement(['in', 'out']),
             'date' => $this->faker->dateTimeBetween('-12 week', '-1 week'),
