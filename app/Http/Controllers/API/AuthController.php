@@ -18,7 +18,7 @@ class AuthController extends BaseController
     /**
      * Register api
      */
-    public function register(Request $request)
+    public function RegisterUsingEmail(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required',
