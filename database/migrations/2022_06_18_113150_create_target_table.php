@@ -17,11 +17,11 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('user_id')->constraid('users')->onDelete('cascade');
             $table->string('name');
-            $table->float('expense');
-            $table->float('daily_payment');
-            $table->float('percentage');
-            $table->float('temp_expense');
-            $table->float('temp_percentage');
+            $table->double('expense', 15, 4);
+            $table->double('daily_payment', 15, 4);
+            $table->double('percentage', 15, 4);
+            $table->double('temp_expense', 15, 4);
+            $table->double('temp_percentage', 15, 4);
             $table->timestamps();
         });
     }

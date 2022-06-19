@@ -5,9 +5,12 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\API\BaseController as BaseController;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Models\Balance;
 use App\Models\Account;
+use App\Models\Budget;
+use App\Models\Target;
 use App\Models\Transaction;
 use App\Models\Institution;
 use Carbon\Carbon;
@@ -123,6 +126,7 @@ class DataController extends BaseController
         }
     }
 
+    // submit otp for new account
     public function submitOtp(Request $request)
     {
         $endpoint = config('api.brick_url') . 'v1/auth/gopay';
@@ -233,5 +237,114 @@ class DataController extends BaseController
             }
 
         }
+    }
+
+    // Get budget list
+    public function getBudgetList()
+    {
+        $budget = Budget::select('amount', DB::raw("DATE_FORMAT(date,'%Y-%m') as months"))
+                        ->where('user_id', auth()->user()->id)
+                        ->orderBy('months', 'desc')
+                        ->get();
+        $expenses = Transaction::select(
+                    DB::raw('sum(amount) as expenses'),
+                    DB::raw("DATE_FORMAT(date,'%Y-%m') as months"))
+                    ->whereRelation('account' ,'user_id', auth()->user()->id)
+                    ->where('direction', 'out')
+                    ->groupBy('months')
+                    ->orderBy('months', 'desc')
+                    ->get();
+        
+        $data['budget'] = Budget::select('amount', DB::raw("DATE_FORMAT(date,'%Y-%m') as months"))
+                                ->where('user_id', auth()->user()->id)
+                                ->orderBy('months', 'desc')
+                                ->get();
+        $data['expenses'] = Transaction::select(
+                                DB::raw('sum(amount) as expenses'),
+                                DB::raw("DATE_FORMAT(date,'%Y-%m') as months"))
+                                ->whereRelation('account' ,'user_id', auth()->user()->id)
+                                ->where('direction', 'out')
+                                ->groupBy('months')
+                                ->orderBy('months', 'desc')
+                                ->get();
+
+        return $this->sendResponse($data, 'Data fetch successfully.');
+    }
+    
+    // Get budget list
+    public function addBudget(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'amount' => 'required',
+            'month' => 'required|string|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error.', ['error'=>$validator->errors()]);
+        }
+
+        $budget = Budget::create([
+            'user_id' => auth()->user()->id,
+            'amount' => $request->amount,
+            'date' => Carbon::parse($request->month)->format('Y-m-d'),
+        ]);
+
+        return $this->sendResponse('Ok', 'Data added successfully.');
+    }
+
+    // Get target list
+    public function getTargetList()
+    {
+        $data['target'] = Target::where('user_id', auth()->user()->id)
+                                ->orderBy('updated_at', 'desc')
+                                ->get();
+
+        return $this->sendResponse($data, 'Data fetch successfully.');
+    }
+
+    // Edit target list
+    public function editDailyTargetPayment(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'target_id' => 'required|string|max:255',
+            'amount' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error.', ['error'=>$validator->errors()]);
+        }
+
+        $target = Target::updateOrCreate(
+            ['user_id' => auth()->user()->id, 'target_id' => $request->target_id],
+            ['daily_payment' => $request->amount]
+        );
+
+        return $this->sendResponse('Ok', 'Data updated successfully.');
+    }
+
+    // add target list
+    public function addTarget(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'expense' => 'required',
+            'percentage' => 'required',
+        ]);
+        
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error.', ['error'=>$validator->errors()]);
+        }
+
+        $target = Target::create([
+            'user_id' => auth()->user()->id,
+            'name' => $request->name,
+            'expense' => $request->expense,
+            'daily_payment' => 0,
+            'percentage' => $request->percentage,
+            'temp_percentage' => 0,
+            'temp_expense' => 0,
+        ]);
+
+        return $this->sendResponse('Ok', 'Data created successfully.');
     }
 }

@@ -34,5 +34,9 @@ Route::middleware('auth:sanctum')->name('data.')->group( function () {
     Route::get('institution', [DataController::class, 'institution'])->name('institution');
     Route::post('request-otp', [DataController::class, 'requestOtp'])->name('requestOtp');
     Route::post('submit-otp', [DataController::class, 'submitOtp'])->name('submitOtp');
-    Route::get('edit-type', [DataController::class, 'editType'])->name('editType');
+    Route::get('budget-list', [DataController::class, 'getBudgetList'])->name('getBudgetList');
+    Route::post('add-budget', [DataController::class, 'addBudget'])->name('addBudget');
+    Route::get('target-list', [DataController::class, 'getTargetList'])->name('getTargetList');
+    Route::post('add-target', [DataController::class, 'addTarget'])->name('addTarget');
+    Route::post('edit-daily-target-payment', [DataController::class, 'editDailyTargetPayment'])->name('editDailyTargetPayment');
 });

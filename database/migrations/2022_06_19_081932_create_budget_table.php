@@ -16,7 +16,6 @@ return new class extends Migration
         Schema::create('budget', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('user_id')->constraid('user')->onDelete('cascade');
-            $table->string('name');
             $table->date('date');
             $table->double('amount', 15, 4);
             $table->timestamps();
